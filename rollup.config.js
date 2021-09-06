@@ -32,7 +32,7 @@ const plugins = [
 
 export default [
   {
-    input: 'src/bar-card.ts',
+    input: 'src/athlios-card.ts',
     output: {
       dir: 'dist',
       format: 'es',

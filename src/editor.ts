@@ -4,7 +4,7 @@ import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig } from 'cust
 import { BarCardConfig } from './types';
 import { createEditorConfigArray, arrayMove, hasConfigOrEntitiesChanged } from './helpers';
 
-@customElement('bar-card-editor')
+@customElement('athlios-card-editor')
 export class BarCardEditor extends LitElement implements LovelaceCardEditor {
   @property() public hass?: HomeAssistant;
   @property() private _config;
@@ -154,7 +154,7 @@ export class BarCardEditor extends LitElement implements LovelaceCardEditor {
 
   protected render(): TemplateResult | void {
     return html`
-      ${this._createEntitiesElement()} ${this._createAppearanceElement()}
+      ${this._createEntitiesElement()}
     `;
   }
 
@@ -185,24 +185,6 @@ export class BarCardEditor extends LitElement implements LovelaceCardEditor {
       const index = this._configArray.indexOf(config);
       valueElementArray.push(html`
         <div class="sub-category" style="display: flex; flex-direction: row; align-items: center;">
-          <div style="display: flex; align-items: center; flex-direction: column;">
-            <div
-              style="font-size: 10px; margin-bottom: -8px; opacity: 0.5;"
-              @click=${this._toggleThing}
-              .options=${options.options.entities[index]}
-              .optionsTarget=${options.options.entities}
-              .index=${index}
-            >
-              options
-            </div>
-            <ha-icon
-              icon="mdi:chevron-${options.options.entities[index].show ? 'up' : 'down'}"
-              @click=${this._toggleThing}
-              .options=${options.options.entities[index]}
-              .optionsTarget=${options.options.entities}
-              .index=${index}
-            ></ha-icon>
-          </div>
           <div class="value" style="flex-grow: 1;">
             <paper-input
               label="Entity"
@@ -213,38 +195,6 @@ export class BarCardEditor extends LitElement implements LovelaceCardEditor {
             >
             </paper-input>
           </div>
-          ${index !== 0
-            ? html`
-                <ha-icon
-                  class="ha-icon-large"
-                  icon="mdi:arrow-up"
-                  @click=${this._moveEntity}
-                  .configDirection=${'up'}
-                  .configArray=${this._config!.entities}
-                  .arrayAttribute=${'entities'}
-                  .arraySource=${this._config}
-                  .index=${index}
-                ></ha-icon>
-              `
-            : html`
-                <ha-icon icon="mdi:arrow-up" style="opacity: 25%;" class="ha-icon-large"></ha-icon>
-              `}
-          ${index !== this._configArray.length - 1
-            ? html`
-                <ha-icon
-                  class="ha-icon-large"
-                  icon="mdi:arrow-down"
-                  @click=${this._moveEntity}
-                  .configDirection=${'down'}
-                  .configArray=${this._config!.entities}
-                  .arrayAttribute=${'entities'}
-                  .arraySource=${this._config}
-                  .index=${index}
-                ></ha-icon>
-              `
-            : html`
-                <ha-icon icon="mdi:arrow-down" style="opacity: 25%;" class="ha-icon-large"></ha-icon>
-              `}
           <ha-icon
             class="ha-icon-large"
             icon="mdi:close"
@@ -276,66 +226,39 @@ export class BarCardEditor extends LitElement implements LovelaceCardEditor {
 
     return html`
       <div class="card-config">
-        <div class="option" @click=${this._toggleThing} .options=${options} .optionsTarget=${this._options}>
-          <div class="row">
-            <ha-icon .icon=${`mdi:${options.icon}`}></ha-icon>
-            <div class="title">${options.name}</div>
-            <ha-icon .icon=${options.show ? `mdi:chevron-up` : `mdi:chevron-down`} style="margin-left: auto;"></ha-icon>
-          </div>
-          <div class="secondary">${options.secondary}</div>
-        </div>
-        ${options.show
-          ? html`
-              <div class="card-background" style="max-height: 400px; overflow: auto;">
-                ${this._createEntitiesValues()}
-                <div class="sub-category" style="display: flex; flex-direction: column; align-items: flex-end;">
-                  <ha-fab
-                    mini
-                    icon="mdi:plus"
-                    @click=${this._addEntity}
-                    .configArray=${this._configArray}
-                    .configAddValue=${'entity'}
-                    .sourceArray=${this._config.entities}
-                  ></ha-fab>
-                </div>
-              </div>
-            `
-          : ''}
+          ${this._createEntitiesValues()}
       </div>
     `;
+    //return html`
+    //  <div class="card-config">
+    //    <div class="option" @click=${this._toggleThing} .options=${options} .optionsTarget=${this._options}>
+    //      <div class="row">
+    //        <ha-icon .icon=${`mdi:${options.icon}`}></ha-icon>
+    //        <div class="title">${options.name}</div>
+    //        <ha-icon .icon=${options.show ? `mdi:chevron-up` : `mdi:chevron-down`} style="margin-left: auto;"></ha-icon>
+    //      </div>
+    //      <div class="secondary">${options.secondary}</div>
+    //    </div>
+    //    ${options.show
+    //      ? html`
+    //          <div class="card-background" style="max-height: 400px; overflow: auto;">
+    //            ${this._createEntitiesValues()}
+    //            <div class="sub-category" style="display: flex; flex-direction: column; align-items: flex-end;">
+    //              <ha-fab
+    //                mini
+    //                icon="mdi:plus"
+    //                @click=${this._addEntity}
+    //                .configArray=${this._configArray}
+    //                .configAddValue=${'entity'}
+    //                .sourceArray=${this._config.entities}
+    //              ></ha-fab>
+    //            </div>
+    //          </div>
+    //        `
+    //      : ''}
+    //  </div>
+    //`;
   }
-
-  private _createAppearanceElement(): TemplateResult {
-    if (!this.hass) {
-      return html``;
-    }
-    const options = this._options.appearance;
-    return html`
-        <div class="option" @click=${this._toggleThing} .options=${options} .optionsTarget=${this._options}>
-          <div class="row">
-            <ha-icon .icon=${`mdi:${options.icon}`}></ha-icon>
-            <div class="title">${options.name}</div>
-            <ha-icon
-              .icon=${options.show ? `mdi:chevron-up` : `mdi:chevron-down`}
-              style="margin-left: auto;"
-            ></ha-icon>
-          </div>
-          <div class="secondary">${options.secondary}</div>
-        </div>
-        ${
-          options.show
-            ? html`
-                <div class="card-background">
-                  ${this._createCardElement()} ${this._createBarElement(null)} ${this._createValueElement(null)}
-                  ${this._createPositionsElement(null)} ${this._createSeverityElement(null)}
-                  ${this._createAnimationElement(null)}
-                </div>
-              `
-            : ''
-        }
-      </div>`;
-  }
-
   private _createBarElement(index): TemplateResult {
     let options;
     let config;
