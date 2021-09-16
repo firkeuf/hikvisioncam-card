@@ -1,7 +1,7 @@
 {
-  "name": "bar-card",
-  "version": "3.2.0",
-  "description": "Lovelace bar-card",
+  "name": "athlios-card",
+  "version": "0.0.3",
+  "description": "Lovelace athlios-card",
   "keywords": [
     "home-assistant",
     "homeassistant",
@@ -10,9 +10,9 @@
     "lovelace",
     "custom-cards"
   ],
-  "module": "bar-card.js",
-  "repository": "git@github.com:custom_cards/bar-card.git",
-  "author": "Lucas Bramlage <lucas.bramlage@gmail.com>",
+  "module": "athlios-card.js",
+  "repository": "git@github.com:firkeuf/athlios-card.git",
+  "author": "Andrii Savchenko <bsd4fir@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "custom-card-helpers": "^1.6.5",
