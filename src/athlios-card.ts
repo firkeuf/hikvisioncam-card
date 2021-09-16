@@ -24,8 +24,6 @@ console.info(
   'color: white; font-weight: bold; background: dimgray',
 );
 
-
-
 // TODO Name your custom element
 @customElement('athlios-card')
 export class AthliOSCard extends LitElement {
@@ -126,7 +124,30 @@ export class AthliOSCard extends LitElement {
       `;
     }
   }
-
+  private _humanTreadmill(StatusConfig, SpeedConfig): TemplateResult {
+    const status = this.hass!.states[StatusConfig.entity].state;
+    const speed = this.hass!.states[SpeedConfig.entity].state;
+    let icon = 'mdi:human-male';
+    let shift = 3;
+    if (speed != 'unknown' && parseFloat(speed) != 0) {
+      icon = 'mdi:run';
+      shift = 0;
+    }
+    if (status == 'off') {
+      return html`
+        <workout-user></workout-user>
+      `;
+    } else {
+      return html`
+        <workout-user>
+          <athlios-card-iconbar style="height: 100%; width: 100%; right: ${shift}%;">
+            <ha-icon style="color: #8c8c8c; --mdc-icon-size: 130%;" icon="${icon}"></ha-icon>
+          </athlios-card-iconbar>
+        </workout-user>
+      `;
+    }
+    return html``;
+  }
   private _speedTreadmill(config): TemplateResult {
     const state = this.hass!.states[config.entity].state;
     const units = this.hass!.states[config.entity].attributes.unit_of_measurement;
@@ -182,6 +203,7 @@ export class AthliOSCard extends LitElement {
     });
 
     rowArray.push(html`
+      ${this._humanTreadmill(sensorStatus, sensorSpeed)}
       <treadmill-bar>
         ${this._statusTreadmill(sensorStatus)} ${this._gradeTreadmill(sensorGrade)} ${this._speedTreadmill(sensorSpeed)}
       </treadmill-bar>
@@ -307,10 +329,6 @@ export class AthliOSCard extends LitElement {
         if (state != 'unknown') {
           rowArray.push(html`
             <workout> Workout: ${state}</workout>
-            <workout-user>
-              <athlios-card-iconbar style="height: 100%; width: 100%;">
-                <ha-icon style="color: #8c8c8c; --mdc-icon-size: 130%;" icon="mdi:run"></ha-icon> </athlios-card-iconbar
-            ></workout-user>
           `);
         }
       }
