@@ -80,12 +80,7 @@ export class AthliOSCard extends LitElement {
     this._rowAmount = this._configArray.length / this._config.columns;
   }
 
-  //protected update(changedProperties: PropertyValues) {
-  //  super.update(changedProperties);
-  //  console.error('UPDATE');
-  //}
   protected render(): TemplateResult | void {
-    console.info('RENDER');
     if (!this._config || !this.hass) {
       return html``;
     }
@@ -117,7 +112,7 @@ export class AthliOSCard extends LitElement {
           <athlios-card-iconbar>
             <ha-icon style="color: red" icon="mdi:power-off"></ha-icon>
           </athlios-card-iconbar>
-          Turned off
+          Stopped
         </treadmill-status>
       `;
     } else {
@@ -126,7 +121,7 @@ export class AthliOSCard extends LitElement {
           <athlios-card-iconbar>
             <ha-icon style="color: #3aea0f" icon="mdi:power"></ha-icon>
           </athlios-card-iconbar>
-          Turned on
+          Running
         </treadmill-status>
       `;
     }
@@ -173,12 +168,6 @@ export class AthliOSCard extends LitElement {
     }
   }
 
-  //- entity: sensor.athlios_home_current_profile
-  //- entity: sensor.athlios_home_heart_rate
-  //- entity: binary_sensor.athlios_home_screensaver
-  //- entity: binary_sensor.athlios_home_treadmill_status
-  //- entity: sensor.athlios_home_workout
-
   private _createTreadmillArray(): TemplateResult[] {
     const perRowArray: object[] = [];
     const rowArray: TemplateResult[] = [];
@@ -191,21 +180,6 @@ export class AthliOSCard extends LitElement {
     const sensorGrade = this._configArray.find(obj => {
       return obj.entity.includes('_grade');
     });
-    //const sensorHeartRate = this._configArray.find(obj => {
-    //  return obj.entity.includes('_heart_rate');
-    //});
-    //const sensorDuration = this._configArray.find(obj => {
-    //  return obj.entity.includes('_duration');
-    //});
-    //const sensorScreensaver = this._configArray.find(obj => {
-    //  return obj.entity.includes('_screensaver');
-    //});
-    //const sensorWorkout = this._configArray.find(obj => {
-    //  return obj.entity.includes('_workout');
-    //});
-    //const sensorProfile = this._configArray.find(obj => {
-    //  return obj.entity.includes('_current_profile');
-    //});
 
     rowArray.push(html`
       <treadmill-bar>
@@ -340,12 +314,19 @@ export class AthliOSCard extends LitElement {
           `);
         }
       }
+
+      if (config.entity.includes('_phase')) {
+        if (state != 'unknown') {
+          rowArray.push(html`
+            <workout-phase> Current Phase: ${state}</workout-phase>
+          `);
+        }
+      }
     }
     return rowArray;
   }
 
   getCardSize(): number {
-    console.info('Get card size');
     return 1;
   }
 }
