@@ -124,20 +124,18 @@ export class AthliOSCard extends LitElement {
       `;
     }
   }
-  private _humanTreadmill(StatusConfig, SpeedConfig): TemplateResult {
+  private _humanTreadmill(StatusConfig, SpeedConfig, InactiveTimeConfig, ScreenSaverConfig): TemplateResult {
     const status = this.hass!.states[StatusConfig.entity].state;
     const speed = this.hass!.states[SpeedConfig.entity].state;
+    const inactiveTime = this.hass!.states[InactiveTimeConfig.entity].state;
+    const screenSaver = this.hass!.states[ScreenSaverConfig.entity].state;
     let icon = 'mdi:human-male';
     let shift = 3;
     if (speed != 'unknown' && parseFloat(speed) != 0) {
       icon = 'mdi:run';
       shift = 0;
     }
-    if (status == 'off') {
-      return html`
-        <workout-user></workout-user>
-      `;
-    } else {
+    if (status != 'off' || (parseInt(inactiveTime, 10) <= 60 && screenSaver == 'off')) {
       return html`
         <workout-user>
           <athlios-card-iconbar style="height: 100%; width: 100%; right: ${shift}%;">
@@ -201,9 +199,15 @@ export class AthliOSCard extends LitElement {
     const sensorGrade = this._configArray.find(obj => {
       return obj.entity.includes('_grade');
     });
+    const sensorInactiveTime = this._configArray.find(obj => {
+      return obj.entity.includes('_inactive_time');
+    });
+    const sensorScreenSaver = this._configArray.find(obj => {
+      return obj.entity.includes('_screensaver');
+    });
 
     rowArray.push(html`
-      ${this._humanTreadmill(sensorStatus, sensorSpeed)}
+      ${this._humanTreadmill(sensorStatus, sensorSpeed, sensorInactiveTime, sensorScreenSaver)}
       <treadmill-bar>
         ${this._statusTreadmill(sensorStatus)} ${this._gradeTreadmill(sensorGrade)} ${this._speedTreadmill(sensorSpeed)}
       </treadmill-bar>
