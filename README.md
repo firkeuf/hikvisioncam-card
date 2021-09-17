@@ -25,6 +25,7 @@ type: custom:athlios-card
 entities:
   - entity: binary_sensor.athlios_home_screensaver
   - entity: binary_sensor.athlios_home_treadmill_status
+  - entity: sensor.athlios_home_inactive_time
   - entity: sensor.athlios_home_current_profile
   - entity: sensor.athlios_home_heart_rate
   - entity: sensor.athlios_home_workout
