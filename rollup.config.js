@@ -32,7 +32,7 @@ const plugins = [
 
 export default [
   {
-    input: 'src/athlios-card.ts',
+    input: 'src/hikvisioncam-card.ts',
     output: {
       dir: 'dist',
       format: 'es',

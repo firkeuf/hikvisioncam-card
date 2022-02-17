@@ -26,7 +26,7 @@ console.info(
 
 // TODO Name your custom element
 @customElement('athlios-card')
-export class AthliOSCard extends LitElement {
+export class HikvisioncamCard extends LitElement {
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     return document.createElement('athlios-card-editor') as LovelaceCardEditor;
   }

@@ -1,7 +1,7 @@
 {
-  "name": "athlios-card",
-  "version": "0.0.4",
-  "description": "Lovelace athlios-card",
+  "name": "hikvisioncam-card",
+  "version": "0.0.1",
+  "description": "Lovelace hikvisioncam-card",
   "keywords": [
     "home-assistant",
     "homeassistant",
@@ -10,8 +10,8 @@
     "lovelace",
     "custom-cards"
   ],
-  "module": "athlios-card.js",
-  "repository": "git@github.com:firkeuf/athlios-card.git",
+  "module": "hikvisioncam-card.js",
+  "repository": "git@github.com:firkeuf/hikvisioncam-card.git",
   "author": "Andrii Savchenko <bsd4fir@gmail.com>",
   "license": "MIT",
   "dependencies": {
@@ -19,6 +19,7 @@
     "home-assistant-js-websocket": "^4.4.0",
     "lit-element": "^2.2.1",
     "lit-html": "^1.1.2",
+    "serialize-javascript": "^6.0.0",
     "yaml": "^1.10.0"
   },
   "devDependencies": {
@@ -29,7 +30,7 @@
     "@types/lodash": "^4.14.158",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
-    "eslint": "^6.6.0",
+    "eslint": "^8.9.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.22.0",
@@ -42,7 +43,8 @@
     "rollup-plugin-serve": "^1.0.3",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.24.3",
-    "rollup-plugin-uglify": "^6.0.3",
+    "rollup-plugin-uglify": "^6.0.4",
+    "serialize-javascript": "^6.0.0",
     "typescript": "^3.9.7"
   },
   "scripts": {
