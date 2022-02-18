@@ -19,7 +19,7 @@ import { styles } from './styles';
 
 /* eslint no-console: 0 */
 console.info(
-  `%c  AthliOS-CARD \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
+  `%c  HikvisionCam-CARD \n%c  ${localize('common.version')} ${CARD_VERSION}    `,
   'color: white; font-weight: bold; background: blue',
   'color: white; font-weight: bold; background: dimgray',
 );

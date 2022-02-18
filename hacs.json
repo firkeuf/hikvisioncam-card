@@ -1,5 +1,5 @@
 {
-    "name": "AthliOS Card",
+    "name": "HikvisionCam Card",
     "render_readme": true,
-    "filename": "athlios-card.js"
+    "filename": "hikvisioncam-card.js"
 }
