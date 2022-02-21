@@ -52,7 +52,6 @@ export class HikvisioncamCard extends LitElement {
     return hasConfigOrEntitiesChanged(this, changedProps, false);
   }
 
-
   async fetchRecent(entityId, start, end, skipInitialState, withAttributes): Promise<object> {
     let url = 'history/period';
     if (start) url += `/${start.toISOString()}`;
@@ -173,7 +172,7 @@ export class HikvisioncamCard extends LitElement {
     });
 
     const end = new Date();
-    const start = new Date(new Date().getTime() - 2 * 60 * 60 * 1000);
+    const start = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
     if (!this.eventsList) {
       this.getHistoryData(sensorStatus, start, end);
     }
