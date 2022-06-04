@@ -78,13 +78,15 @@ export class HikvisioncamCard extends LitElement {
         return o.attributes;
       });
 
-    console.warn('get min max', response);
     this.eventsList = hist;
     this._EventNumMax = hist.length - 1;
     this._currentEventNum = this._EventNumMax;
-    console.error('Hist length', hist.length, this._EventNumMax);
 
     await this.requestUpdate();
+    // @ts-ignore
+    const elt = this.shadowRoot.querySelector('#hikvisioncam__' + this._entityName + '_item_' + this._currentEventNum);
+    if (elt) elt.scrollIntoView({ inline: 'nearest' });
+    this._get_canvas(this.eventsList[this._currentEventNum]);
     return response;
   }
 
@@ -139,7 +141,14 @@ export class HikvisioncamCard extends LitElement {
             ? ''
             : 'flex-grow: 0;'}"
         >
-          ${this._createHikvisionArray()}
+          ${this._createHikvisionArray().length === 0
+            ? html`
+                <div class="hikvisioncam-card_empty">
+                  <div>${this._entityName}</div>
+                  <div>No Events</div>
+                </div>
+              `
+            : this._createHikvisionArray()}
         </div>
       </ha-card>
     `;
@@ -153,15 +162,31 @@ export class HikvisioncamCard extends LitElement {
     `;
   }
   private _getNavBar(list): TemplateResult {
+    const copy_list = [...list];
     return html`
-      ${list.map((item, i) => {
+      ${copy_list.reverse().map((item, i, array) => {
+        const j = array.length - 1 - i;
+
         return html`
-          <item id="hikvisioncam__item_${i}" @click="${(): void => this._setCurrentEventNum(i)}"
-            >${this._shortTime(item.last_tripped_time)}</item
+          <item
+            id="hikvisioncam__${this._entityName}_item_${j}"
+            class="${j == this._currentEventNum ? 'hikvisioncam__item_selected' : ''}"
+            @click="${(): void => this._setCurrentEventNum(j)}"
           >
+            ${this._shortTime(item.last_tripped_time)}
+          </item>
         `;
       })}
     `;
+  }
+
+  private _getBox(currentEventData): string {
+    try {
+      return currentEventData.box.join(', ');
+    } catch (error) {
+      console.error(error);
+      return '';
+    }
   }
 
   private _createHikvisionArray(): TemplateResult[] {
@@ -172,11 +197,15 @@ export class HikvisioncamCard extends LitElement {
     });
 
     const end = new Date();
-    const start = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+    const start = new Date(new Date().getTime() - 168 * 60 * 60 * 1000);
     if (!this.eventsList) {
       this.getHistoryData(sensorStatus, start, end);
+      return rowArray;
     }
     const currentEventData = this.eventsList[this._currentEventNum];
+    if (!currentEventData) {
+      return rowArray;
+    }
     rowArray.push(html`
       <hikvision-main>
         <nav-bar>
@@ -191,12 +220,12 @@ export class HikvisioncamCard extends LitElement {
               ${this._shortTime(currentEventData.last_tripped_time)}
             </div>
             <div class="hikvisioncam__box">
-              Box [${currentEventData.box.join(', ')}]
+              Detected object: ${currentEventData.detected_object}
             </div>
           </div>
 
           <div class="hikvisioncam__img">
-            <img src="${this._imgUrl(currentEventData.file_path)}" alt="No Image" />
+            <canvas id="canvas"></canvas>
           </div>
 
           <div class="hikvisioncm__control">
@@ -226,7 +255,17 @@ export class HikvisioncamCard extends LitElement {
 
   _imgUrl(file_path): string {
     const path = '/local/hikvision/';
-    const file = file_path.split('/').slice(-1) + '.orig.jpg';
+    const file = file_path.split('/').slice(-1);
+    return path + encodeURIComponent(file);
+  }
+
+  _imgUrlCropped(file_path): string {
+    const path = '/local/hikvision/';
+    const file =
+      file_path
+        .split('/')
+        .slice(-1)[0]
+        .split('.jpg')[0] + '.crop.jpg';
     return path + encodeURIComponent(file);
   }
 
@@ -234,6 +273,8 @@ export class HikvisioncamCard extends LitElement {
     if (i <= this._EventNumMax && i >= this._EventNumMin) {
       this._currentEventNum = i;
       this.requestUpdate();
+      const currentEventData = this.eventsList[this._currentEventNum];
+      this._get_canvas(currentEventData);
     }
   }
 
@@ -241,6 +282,14 @@ export class HikvisioncamCard extends LitElement {
     if (this._currentEventNum > this._EventNumMin) {
       this._currentEventNum -= 1;
       this.requestUpdate();
+      const currentEventData = this.eventsList[this._currentEventNum];
+      // @ts-ignore
+      const elt = this.shadowRoot.querySelector(
+        '#hikvisioncam__' + this._entityName + '_item_' + this._currentEventNum,
+      );
+      if (elt) elt.scrollIntoView({ inline: 'nearest' });
+
+      this._get_canvas(currentEventData);
     }
   }
 
@@ -248,6 +297,13 @@ export class HikvisioncamCard extends LitElement {
     if (this._currentEventNum < this._EventNumMax) {
       this._currentEventNum += 1;
       this.requestUpdate();
+      // @ts-ignore
+      const elt = this.shadowRoot.querySelector(
+        '#hikvisioncam__' + this._entityName + '_item_' + this._currentEventNum,
+      );
+      if (elt) elt.scrollIntoView({ inline: 'nearest' });
+      const currentEventData = this.eventsList[this._currentEventNum];
+      this._get_canvas(currentEventData);
     } else {
       this.getHistoryData(sensorStatus, start, end);
     }
@@ -257,7 +313,54 @@ export class HikvisioncamCard extends LitElement {
     this.getHistoryData(sensorStatus, start, end);
   }
 
+  _get_canvas(currentEventData): void {
+    // @ts-ignore
+    const canvas = this.shadowRoot.querySelector('#canvas');
+    // @ts-ignore
+    const ctx = canvas.getContext('2d');
+    // @ts-ignore
+    const img = new Image();
+    const imgCropped = new Image();
+    img.addEventListener(
+      'load',
+      function() {
+        const box = currentEventData.box;
+        ctx.canvas.width = window.innerWidth;
+        ctx.canvas.height = (window.innerWidth * img.height) / img.width;
+        ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.strokeStyle = '#06f906';
+        ctx.lineWidth = 5;
+        ctx.strokeRect(
+          box[0] * ctx.canvas.width,
+          box[1] * ctx.canvas.height,
+          box[2] * ctx.canvas.width,
+          box[3] * ctx.canvas.height,
+        );
+        let croppedStartX = 5;
+        let croppedStartY = 5;
+        let mult = Math.trunc((ctx.canvas.height - croppedStartY) / imgCropped.height);
+        if (imgCropped.width > imgCropped.height) {
+          mult = Math.trunc((ctx.canvas.height - croppedStartY) / imgCropped.width);
+        }
+        if (mult <= 2) {
+          mult = 3;
+        } else if (mult > 10) {
+          mult = 10;
+        }
+
+        if (box[0] * ctx.canvas.width < imgCropped.width * mult) {
+          croppedStartX = ctx.canvas.width - imgCropped.width * mult - 5;
+          croppedStartY = ctx.canvas.height - imgCropped.height * mult - 5;
+        }
+        ctx.strokeRect(croppedStartX, croppedStartY, imgCropped.width * mult, imgCropped.height * mult);
+        ctx.drawImage(imgCropped, croppedStartX, croppedStartY, imgCropped.width * mult, imgCropped.height * mult);
+      },
+      false,
+    );
+    img.src = this._imgUrl(currentEventData.file_path);
+    imgCropped.src = this._imgUrlCropped(currentEventData.file_path);
+  }
   getCardSize(): number {
-    return 1;
+    return 2;
   }
 }

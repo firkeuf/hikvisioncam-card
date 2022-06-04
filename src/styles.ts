@@ -199,6 +199,14 @@ export const styles = html`
         .type-custom-hikvisioncam-card {
             height: 50%;
         }
+        .hikvisioncam-card_empty {
+            height: 60ex;
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            color: grey;
+            flex-direction: column;
+        }
 
         hikvision-main {
             display: flex;
@@ -211,8 +219,8 @@ export const styles = html`
 
         nav-bar {
             display: flex;
-            scroll-snap-type: x;
-            justify-content: flex-start;
+
+            flex-direction: row-reverse;
             min-height: 100%;
             padding: 10px;
             overflow-y: hidden;
@@ -222,15 +230,20 @@ export const styles = html`
 
         nav-bar > item {
             display: flex;
-            scroll-snap-align: start;
+            
             flex-direction: column;
             margin: 5px;
             border: black;
             font-size: smaller;
             min-width: 60px;
+            height: fit-content;
             box-shadow: 1px 1px 3px #dedede;
+            padding-left: 5px;
+            padding-right: 3px;
         }
-        
+        .hikvisioncam__item_selected {
+            background: #ddd;
+        }
 
         hikvision-content {
             display: flex;
@@ -242,6 +255,10 @@ export const styles = html`
             max-height: 100%;
         }
         .hikvisioncam__img {
+            height: 100%;
+            width: 100%;
+        }
+        .hikvisioncam__img > canvas {
             height: 100%;
             width: 100%;
         }
